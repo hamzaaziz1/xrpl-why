@@ -60,6 +60,19 @@ export async function explain(
   }
 
   // the interesting one: four+ causes, no information in the code
+  if (code === 'tecPATH_PARTIAL' && context?.kind === 'payment') {
+    return {
+      code,
+      summary: 'A path exists, but not enough liquidity to deliver the full amount.',
+      findings: [{
+        reason: 'The sender holds less than they tried to send, or the path could only carry part of it.',
+        severity: 'likely',
+        fix: 'Check the sender\'s balance for this currency. Reduce the amount, or set tfPartialPayment if delivering less is acceptable.',
+      }],
+      checked,
+    }
+  }
+
   if (code === 'tecPATH_DRY' && context?.kind === 'payment') {
     return await explainPathDry(client, context, checked)
   }
@@ -160,6 +173,37 @@ async function explainPathDry(
     })
     return done(findings, checked)
   }
+  // the sender's own line may be frozen even when the destination's is fine
+  if (ctx.account !== issuer) {
+    const senderLines: any = await client.request({
+      command: 'account_lines',
+      account: ctx.account,
+      ledger_index: 'validated',
+    })
+    checked.push(`read sender trust line for ${ctx.account}`)
+
+    const sl = (senderLines.result.lines ?? []).find(
+      (l: any) => l.currency === currency && l.account === issuer,
+    )
+    if (sl?.freeze_peer) {
+      findings.push({
+        reason: 'The issuer has frozen the SENDER\'s trust line.',
+        severity: 'certain',
+        fix: 'The issuer must clear the freeze on the sender with tfClearFreeze. A frozen holder cannot send, even though their balance is intact.',
+      })
+      return done(findings, checked)
+    }
+    if (sl?.freeze) {
+      findings.push({
+        reason: 'The sender has frozen their own trust line.',
+        severity: 'certain',
+        fix: 'The sender must clear their own freeze.',
+      })
+      return done(findings, checked)
+    }
+    checked.push('sender line is not frozen')
+  }
+
   if (issuerFlags & lsfGlobalFreeze) {
     findings.push({
       reason: 'The issuer has a global freeze on all its tokens.',
