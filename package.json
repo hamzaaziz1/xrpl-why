@@ -2,22 +2,42 @@
   "name": "xrpl-why",
   "version": "0.1.0",
   "description": "Explains why your XRPL transaction actually failed",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "vitest run --testTimeout=180000 --hookTimeout=180000",
-    "demo": "tsx src/demo.ts"
+    "demo": "tsx src/demo.ts",
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
   },
-  "keywords": [],
+  "keywords": [
+    "xrpl",
+    "xrp",
+    "ripple",
+    "debugging",
+    "diagnostics",
+    "tecPATH_DRY"
+  ],
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "type": "module",
-  "dependencies": {
-    "xrpl": "^5.1.0"
-  },
   "devDependencies": {
     "@types/node": "^26.4.0",
     "tsx": "^4.23.13",
     "typescript": "^7.0.2",
-    "vitest": "^4.1.11"
+    "vitest": "^4.1.11",
+    "xrpl": "^5.1.0"
+  },
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hamzaaziz1/xrpl-why.git"
+  },
+  "peerDependencies": {
+    "xrpl": ">=4.0.0"
   }
 }
