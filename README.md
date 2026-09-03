@@ -26,6 +26,8 @@ checks run:
   - trust line exists
   - read issuer flags: 0x00040000
 ```
+A full write-up of all five causes, with reproductions and a diagnostic
+checklist: [tecPATH_DRY means five different things](https://hamzaaziz.hashnode.dev/tecpath-dry-means-five-different-things)
 
 ## Install
 
