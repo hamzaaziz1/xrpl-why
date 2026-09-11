@@ -14,6 +14,14 @@ const STATIC: Record<string, { summary: string; findings: Finding[] }> = {
       fix: 'Issue the account a credential the domain accepts, and make sure the account has ACCEPTED it — an issued-but-unaccepted credential does not grant membership.',
     }],
   },
+  tecNO_LINE: {
+    summary: 'The account has no trust line for this token.',
+    findings: [{
+      reason: 'The account holds no trust line for this currency and issuer, so it cannot receive or hold the token.',
+      severity: 'certain',
+      fix: 'The account must submit a TrustSet to opt in, and the issuer must authorize it if RequireAuth is set. Bidding for a token you have no trust line for fails this way — the offer would deliver something you cannot hold.',
+    }],
+  },
   tecNO_LINE_REDUNDANT: {
     summary: 'That trust line change would have no effect.',
     findings: [{
